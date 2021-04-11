@@ -8,7 +8,6 @@ import de.ungefroren.JMacros.core.config.MacroData;
 import de.ungefroren.JMacros.core.config.ProfileData;
 import de.ungefroren.JMacros.core.nativehook.NativeHook;
 import de.ungefroren.JMacros.core.registry.ActionRegistry;
-import de.ungefroren.JMacros.core.ui.editor.ConfigStage;
 import de.ungefroren.JMacros.core.ui.overlay.Overlay;
 import de.ungefroren.JMacros.core.ui.tray.Tray;
 import javafx.application.Application;
@@ -66,8 +65,6 @@ public class JMacros extends Application {
         configManager.loadConfig();
         configManager.loadProfiles();
         currentProfile = configManager.getDefaultProfile().orElse(null);
-
-        new ConfigStage().show();
 
         tray = new Tray();
         robot = new Robot();
