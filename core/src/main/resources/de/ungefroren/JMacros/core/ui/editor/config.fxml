@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="360.0" minWidth="270.0" prefHeight="540.0" prefWidth="405.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.ungefroren.JMacros.core.ui.editor.ConfigController">
+   <children>
+      <HBox fx:id="header" maxHeight="-Infinity" maxWidth="-Infinity" onMouseDragged="#windowDrag" onMousePressed="#windowDragStart" prefHeight="31.0" prefWidth="405.0" style="-fx-background-color: #242629;">
+         <children>
+            <ImageView fitHeight="29.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets bottom="1.0" left="8.0" right="8.0" top="1.0" />
+               </HBox.margin>
+               <image>
+                  <Image url="@/de/ungefroren/JMacros/core/ui/icons/icon.png" />
+               </image>
+            </ImageView>
+            <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="31.0" prefWidth="313.0" text="JMacros - Settings" textFill="WHITE">
+               <font>
+                  <Font size="16.0" />
+               </font>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <Label fx:id="exitButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#exitButtonMouseEnter" onMouseExited="#exitButtonMouseExit" onMousePressed="#exit" prefHeight="29.0" prefWidth="45.0" text="✕" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <padding>
+                  <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+               </padding>
+               <HBox.margin>
+                  <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+      <ScrollPane hbarPolicy="NEVER" maxWidth="1.7976931348623157E308" prefWidth="405.0" vbarPolicy="ALWAYS">
+         <content>
+            <VBox fx:id="settingsList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="467.0" prefWidth="390.0">
+               <children>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+      <HBox alignment="TOP_RIGHT" maxHeight="40.0" maxWidth="1.7976931348623157E308" prefHeight="40.0">
+         <children>
+            <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#reset" prefWidth="65.0" text="Reset">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <HBox.margin>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </HBox.margin>
+            </Button>
+            <Button cancelButton="true" contentDisplay="CENTER" mnemonicParsing="false" onAction="#cancel" prefWidth="65.0" text="Cancel">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <HBox.margin>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </HBox.margin>
+            </Button>
+            <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#save" prefWidth="65.0" text="Save">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <HBox.margin>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+</VBox>
