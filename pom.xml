@@ -8,7 +8,7 @@
     <artifactId>JMacros</artifactId>
     <groupId> io.github.joblo2213</groupId>
     <packaging>pom</packaging>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
 
     <modules>
         <module>API</module>
