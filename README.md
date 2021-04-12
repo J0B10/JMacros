@@ -25,3 +25,14 @@ But you probably want more than just 12 Hotkeys. That's why profiles exist (тЪая
 You can organize up to 12 Hotkeys in one profile and cycle through them as needed or create a folder structure.  
 
 There will also be an API to create your own Macros using java code. 
+
+## Install & Build
+
+If you want to test it, download the latest build from the [releases page](https://github.com/joblo2213/JMacros/releases) and run the start script.
+
+You will need **Java 11 or newer** to run it.
+
+Alongside the download comes a example configuration to get started. The scripts run JMacros in portable mode where the configs can be placed in the same location as the jar.  
+In default mode all configs are saved to `~/.jmacros`.  
+
+If you want to build the sources on your own you'll need maven. Run `mvn clean package` in the project root directory. The final JAR will be created in `core/target/`.
