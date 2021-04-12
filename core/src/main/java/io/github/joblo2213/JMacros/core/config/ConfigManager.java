@@ -55,8 +55,14 @@ public class ConfigManager {
             if (System.getProperty("os.name").startsWith("mac"))
                 configDir = Paths.get(System.getProperty("user.home")).resolve("Library/Application Support/jmacros");
 
-            String xdgConfigHome = System.getenv().get("XDG_CONFIG_HOME");
-            if (!xdgConfigHome.isBlank()) configDir = Paths.get(xdgConfigHome).resolve("jmacros");
+            String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
+            try {
+                if (xdgConfigHome != null && !xdgConfigHome.isBlank()) configDir = Paths.get(xdgConfigHome).resolve("jmacros");
+            } catch (InvalidPathException e) {
+                logger.error("XDG_CONFIG_HOME environment variable does not point to a valid path");
+                logger.error(e.getMessage(), e);
+                logger.info("Falling back to legacy dir");
+            }
 
             this.configDir = configDir;
         }
