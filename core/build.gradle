@@ -1,0 +1,35 @@
+apply plugin: 'application'
+
+javafx {
+    modules = [
+            'javafx.controls',
+            'javafx.fxml'
+    ]
+}
+
+application {
+    mainClassName = 'io.github.joblo2213.JMacros.core.Launcher'
+}
+
+repositories {
+    maven { url = 'https://artifactory.cronapp.io/public-release/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}
+
+dependencies {
+    implementation project(':api')
+    implementation project(':api').configurations.compile.asFileTree
+
+    implementation 'com.github.kwhat:jnativehook:2.2-SNAPSHOT'
+    implementation 'com.dorkbox:SystemTray:4.1'
+    implementation 'org.slf4j:slf4j-simple:1.7.30'
+    implementation 'com.google.code.gson:gson-extras:2.8.5'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': application.mainClassName
+        attributes 'Specification-Version': '2.2', 'com/github/kwhat/jnativehook'
+        attributes 'Implementation-Version': '0-SNAPSHOT', 'com/github/kwhat/jnativehook'
+    }
+}

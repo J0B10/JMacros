@@ -1,0 +1,4 @@
+rootProject.name = 'JMacros'
+
+include ':core'
+include ':api'

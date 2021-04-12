@@ -1,0 +1,61 @@
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+    apply plugin: 'org.openjfx.javafxplugin'
+
+    group = 'io.github.joblo2213'
+    version = '0.1.1-SNAPSHOT'
+
+    sourceCompatibility = targetCompatibility = '11'
+
+    repositories {
+        mavenCentral()
+    }
+
+    javafx {
+        version = "15.0.1"
+    }
+
+    dependencies {
+        implementation 'com.google.code.gson:gson:2.8.6'
+        implementation 'org.openjfx:javafx-controls:15.0.1'
+    }
+
+    jar {
+        archiveBaseName = rootProject.name
+        archiveClassifier = project.name
+    }
+    
+    task fatjar(type: Jar) {
+        archiveBaseName = rootProject.name
+        archiveClassifier = "${project.name}-fatjar"
+        configurations.compile.each { dep -> from(project.zipTree(dep)) {
+            exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+        } }
+        manifest = jar.manifest
+        with jar
+    }
+    build.dependsOn fatjar
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = project.group
+                artifactId = rootProject.name
+                version = project.version
+                artifact jar
+                artifact fatjar
+            }
+        }
+
+        repositories {
+            maven {
+                url rootProject.file('maven')
+            }
+        }
+    }
+}
