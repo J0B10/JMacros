@@ -6,7 +6,7 @@ JMacros allows you to create hotkeys, macros and scripts in a fast and easy way 
 It is good-looking, platform independent and extremely versatile.
 
 JMacros aims to solve the problems many other hotkey/macro solutions have:  
-You don't have to memorize hotkeys, don't have to buy expensive gear (I'm looking at you [elgato stream deck](https://www.elgato.com/de/stream-deck) 👀)
+You don't have to memorize hotkeys, don't have to buy expensive gear (I'm looking at you [elgato stream deck](https://www.elgato.com/en/stream-deck) 👀)
 and it's not as stubborn as [AutoHotkey](https://www.autohotkey.com/), while being as versatile as the competitors.
 
 ### ⚠️ Note
