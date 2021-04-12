@@ -33,13 +33,30 @@ subprojects {
     task fatjar(type: Jar) {
         archiveBaseName = rootProject.name
         archiveClassifier = "${project.name}-fatjar"
-        configurations.compile.each { dep -> from(project.zipTree(dep)) {
-            exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
-        } }
+        doLast {
+            configurations.compile.each { dep ->
+                println (dep)
+                from(project.zipTree(dep)) {
+                    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+                }
+            }
+        }
         manifest = jar.manifest
         with jar
     }
     build.dependsOn fatjar
+
+    // We need an extra task as this will resolve the configuration
+    task configureFatJar {
+        doLast {
+            configurations.compileClasspath.each { dep ->
+                fatjar.from(project.zipTree(dep)) {
+                    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+                }
+            }
+        }
+    }
+    fatjar.dependsOn configureFatJar
 
     publishing {
         publications {
