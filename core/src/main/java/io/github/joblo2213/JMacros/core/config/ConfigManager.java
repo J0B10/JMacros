@@ -47,17 +47,23 @@ public class ConfigManager {
     private final List<ProfileData> profiles = new ArrayList<>();
     private Config config;
 
-    public ConfigManager(Path configDir) {
-        this.configDir = configDir;
-        this.configFile = configDir.resolve("config.json");
-        this.profilesDir = configDir.resolve("profiles");
-        this.iconsDir = configDir.resolve("icons");
-    }
-
     public ConfigManager(boolean isPortable) {
-        this(isPortable
-                ? Paths.get(System.getProperty("user.dir"))
-                : Paths.get(System.getProperty("user.home"), ".jmacros"));
+        if (isPortable) configDir = Paths.get(System.getProperty("user.dir"));
+        else {
+            Path configDir;
+            configDir = Paths.get(System.getProperty("user.home")).resolve(".jmacros");
+            if (System.getProperty("os.name").startsWith("mac"))
+                configDir = Paths.get(System.getProperty("user.home")).resolve("Library/Application Support/jmacros");
+
+            String xdgConfigHome = System.getenv().get("XDG_CONFIG_HOME");
+            if (!xdgConfigHome.isBlank()) configDir = Paths.get(xdgConfigHome).resolve("jmacros");
+
+            this.configDir = configDir;
+        }
+
+        configFile = configDir.resolve("config.json");
+        profilesDir = configDir.resolve("profiles");
+        iconsDir = configDir.resolve("icons");
     }
 
 
