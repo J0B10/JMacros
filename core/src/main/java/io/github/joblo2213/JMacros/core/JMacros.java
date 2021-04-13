@@ -1,6 +1,5 @@
 package io.github.joblo2213.JMacros.core;
 
-import io.github.joblo2213.JMacros.api.Action;
 import io.github.joblo2213.JMacros.core.action.Key;
 import io.github.joblo2213.JMacros.core.config.Config;
 import io.github.joblo2213.JMacros.core.config.ConfigManager;
@@ -21,8 +20,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -37,7 +34,7 @@ public class JMacros extends Application {
     private ConfigManager configManager;
     private NativeHook nativeHook;
     private Overlay overlay;
-    private ScheduledExecutorService actionsExecutor;
+    private ActionsExecutor actionsExecutor;
     private Tray tray;
 
     private volatile ProfileData currentProfile;
@@ -61,7 +58,7 @@ public class JMacros extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         state = ApplicationState.STARTUP;
-        actionsExecutor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "JMacroActions"));
+        actionsExecutor = new ActionsExecutor();
         configManager.loadConfig();
         configManager.loadProfiles();
         currentProfile = configManager.getDefaultProfile().orElse(null);
@@ -126,13 +123,7 @@ public class JMacros extends Application {
         Optional<MacroData> macro = Arrays.stream(getCurrentProfile().get().getMacros())
                 .filter(m -> m != null && m.getKeyCode() == functionKey).findAny();
         if (macro.isEmpty()) return false;
-        List<Action> actions = macro.get().getActions();
-        actions.forEach(action -> actionsExecutor.schedule(() -> {
-            try {
-                action.run();
-            } catch (InterruptedException ignored) {
-            }
-        }, 0, TimeUnit.MILLISECONDS));
+        actionsExecutor.runActions(macro.get());
         return true;
     }
 

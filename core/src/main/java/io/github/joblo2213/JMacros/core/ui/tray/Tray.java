@@ -2,7 +2,6 @@ package io.github.joblo2213.JMacros.core.ui.tray;
 
 import com.dustinredmond.fxtrayicon.FXTrayIcon;
 import io.github.joblo2213.JMacros.core.JMacros;
-import io.github.joblo2213.JMacros.core.config.ConfigManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.MenuItem;
