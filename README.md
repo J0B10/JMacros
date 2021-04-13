@@ -35,4 +35,20 @@ You will need **Java 11 or newer** to run it.
 Alongside the download comes a example configuration to get started. The scripts run JMacros in portable mode where the configs can be placed in the same location as the jar.  
 In default mode all configs are saved to `~/.jmacros`.  
 
-If you want to build the sources on your own you'll need maven. Run `mvn clean package` in the project root directory. The final JAR will be created in `core/target/`.
+If you want to build the sources on your own you'll need maven.  
+First clone the repo including submodules with `git clone --recurse-submodules https://github.com/joblo2213/JMacros.git`.  
+Then run `mvn clean package` in the project root directory. The final JAR will be created in `core/target/`.
+
+## Known Issues
+
+* On Linux Devices currently consuming key events is currently not possible  
+  (see issues [kwhat/jnativehook#244](https://github.com/kwhat/jnativehook/issues/244) & [kwhat/jnativehook#211](https://github.com/kwhat/jnativehook/issues/211))
+  
+* Some linux desktop environments don't work properly with `java.awt.SystemTray` and won't show the tray icon.  
+  You probably already had this issue with other applications and know some workarounds.  
+  If not, searching for [`Java blank Window (insert wmname)`](https://www.google.com/search?q=Java+blank+Window+(insert+wmname)) on google might help.
+
+## Third party libraries
+* [OpenJFX](https://github.com/openjdk/jfx/) licensed under [GPL v2 with the Classpath exception](https://github.com/openjdk/jfx/blob/master/LICENSE)  
+* [Gson](https://github.com/google/gson) licensed under [Apache License 2.0](https://github.com/google/gson/blob/master/LICENSE)  
+* [FXTrayIcon](https://github.com/dustinkredmond/FXTrayIcon) licensed under [MIT License](https://github.com/dustinkredmond/FXTrayIcon/blob/main/LICENSE)
