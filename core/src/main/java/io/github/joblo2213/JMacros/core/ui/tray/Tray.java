@@ -29,7 +29,7 @@ public class Tray implements Closeable {
             tray.addExitItem(true);
             tray.addTitleItem(false);
             MenuItem reloadConfig = new MenuItem("Reload config");
-            reloadConfig.addEventHandler(ActionEvent.ACTION, this::onReloadConfig);
+            reloadConfig.setOnAction(this::onReloadConfig);
             tray.addMenuItem(reloadConfig);
             tray.show();
             logger.debug("Created tray icon");
