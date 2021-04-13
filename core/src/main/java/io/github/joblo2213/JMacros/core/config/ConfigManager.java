@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -47,17 +48,29 @@ public class ConfigManager {
     private final List<ProfileData> profiles = new ArrayList<>();
     private Config config = new Config();
 
-    public ConfigManager(Path configDir) {
-        this.configDir = configDir;
-        this.configFile = configDir.resolve("config.json");
-        this.profilesDir = configDir.resolve("profiles");
-        this.iconsDir = configDir.resolve("icons");
-    }
-
     public ConfigManager(boolean isPortable) {
-        this(isPortable
-                ? Paths.get(System.getProperty("user.dir"))
-                : Paths.get(System.getProperty("user.home"), ".jmacros"));
+        if (isPortable) configDir = Paths.get(System.getProperty("user.dir"));
+        else {
+            Path configDir;
+            configDir = Paths.get(System.getProperty("user.home")).resolve(".jmacros");
+            if (System.getProperty("os.name").startsWith("mac"))
+                configDir = Paths.get(System.getProperty("user.home")).resolve("Library/Application Support/jmacros");
+
+            String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
+            try {
+                if (xdgConfigHome != null && !xdgConfigHome.isBlank()) configDir = Paths.get(xdgConfigHome).resolve("jmacros");
+            } catch (InvalidPathException e) {
+                logger.error("XDG_CONFIG_HOME environment variable does not point to a valid path");
+                logger.error(e.getMessage(), e);
+                logger.info("Falling back to legacy dir");
+            }
+
+            this.configDir = configDir;
+        }
+
+        configFile = configDir.resolve("config.json");
+        profilesDir = configDir.resolve("profiles");
+        iconsDir = configDir.resolve("icons");
     }
 
 
