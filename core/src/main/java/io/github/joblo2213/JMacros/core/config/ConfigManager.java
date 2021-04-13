@@ -45,7 +45,7 @@ public class ConfigManager {
 
     private final HashMap<Integer, Path> profileConfigFiles = new HashMap<>();
     private final List<ProfileData> profiles = new ArrayList<>();
-    private Config config;
+    private Config config = new Config();
 
     public ConfigManager(Path configDir) {
         this.configDir = configDir;
