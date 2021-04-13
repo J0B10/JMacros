@@ -79,6 +79,7 @@ public class JMacros extends Application {
         state = ApplicationState.SHUTDOWN;
         actionsExecutor.shutdown();
         nativeHook.close();
+        tray.close();
         try {
             boolean shutdown = actionsExecutor.awaitTermination(5, TimeUnit.SECONDS);
             if (!shutdown) actionsExecutor.shutdownNow();
