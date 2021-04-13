@@ -65,8 +65,7 @@ public class JMacros extends Application {
         configManager.loadConfig();
         configManager.loadProfiles();
         currentProfile = configManager.getDefaultProfile().orElse(null);
-
-        tray = new Tray();
+        tray = new Tray(stage);
         robot = new Robot();
         nativeHook = new NativeHook(Level.WARNING);
         overlay = new Overlay(stage, getConfig().getScale());
@@ -80,7 +79,6 @@ public class JMacros extends Application {
         state = ApplicationState.SHUTDOWN;
         actionsExecutor.shutdown();
         nativeHook.close();
-        tray.close();
         try {
             boolean shutdown = actionsExecutor.awaitTermination(5, TimeUnit.SECONDS);
             if (!shutdown) actionsExecutor.shutdownNow();

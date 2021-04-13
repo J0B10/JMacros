@@ -1,39 +1,27 @@
 package io.github.joblo2213.JMacros.core.ui.tray;
 
+import com.dustinredmond.fxtrayicon.FXTrayIcon;
 import io.github.joblo2213.JMacros.core.JMacros;
-import dorkbox.systemTray.Menu;
-import dorkbox.systemTray.MenuItem;
-import dorkbox.systemTray.SystemTray;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.scene.control.MenuItem;
+import javafx.stage.Stage;
 
-import java.awt.event.ActionEvent;
-import java.io.Closeable;
-import java.util.Objects;
+public class Tray {
 
-public class Tray implements Closeable {
 
-    private final SystemTray tray;
-
-    public Tray() {
-        tray = SystemTray.get();
-        if (tray == null) throw new RuntimeException("Unable to load SystemTray!");
-        tray.setStatus(JMacros.APPLICATION_NAME);
-        tray.setImage(Objects.requireNonNull(getClass().getResourceAsStream(JMacros.APPLICATION_ICON_URL)));
-        Menu mainMenu = tray.getMenu();
-        mainMenu.add(new MenuItem("Reload config", this::onReloadConfig));
-        mainMenu.add(new MenuItem("Quit", this::onQuit));
-    }
-
-    private void onQuit(ActionEvent e) {
-        Platform.exit();
+    public Tray(Stage primaryStage) {
+        FXTrayIcon tray = new FXTrayIcon(primaryStage, getClass().getResource(JMacros.APPLICATION_ICON_URL));
+        tray.setApplicationTitle(JMacros.APPLICATION_NAME);
+        tray.setTrayIconTooltip(JMacros.APPLICATION_NAME);
+        tray.addExitItem(true);
+        MenuItem reloadConfig = new MenuItem("Reload config");
+        reloadConfig.addEventHandler(ActionEvent.ACTION, this::onReloadConfig);
+        tray.addMenuItem(reloadConfig);
+        tray.show();
     }
 
     private void onReloadConfig(ActionEvent e){
         Platform.runLater(() -> JMacros.getInstance().reloadConfig());
-    }
-
-    @Override
-    public void close() {
-        tray.shutdown();
     }
 }

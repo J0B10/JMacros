@@ -13,6 +13,7 @@
     <modules>
         <module>API</module>
         <module>core</module>
+        <module>FXTrayIcon</module>
     </modules>
 
     <dependencies>

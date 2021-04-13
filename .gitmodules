@@ -1,0 +1,3 @@
+[submodule "FXTrayIcon"]
+	path = FXTrayIcon
+	url = https://github.com/dustinkredmond/FXTrayIcon
