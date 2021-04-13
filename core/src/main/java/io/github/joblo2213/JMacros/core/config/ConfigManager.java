@@ -68,6 +68,7 @@ public class ConfigManager {
             this.configDir = configDir;
         }
 
+        logger.info("Config dir: " + configDir);
         configFile = configDir.resolve("config.json");
         profilesDir = configDir.resolve("profiles");
         iconsDir = configDir.resolve("icons");
