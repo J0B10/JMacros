@@ -2,8 +2,8 @@ package io.github.joblo2213.JMacros.core.config;
 
 import io.github.joblo2213.JMacros.api.Action;
 import io.github.joblo2213.JMacros.api.Macro;
-import io.github.joblo2213.JMacros.api.configuration.parameters.ColorParameter;
 import io.github.joblo2213.JMacros.api.configuration.InvalidParameterException;
+import io.github.joblo2213.JMacros.api.configuration.parameters.ColorParameter;
 import io.github.joblo2213.JMacros.api.configuration.parameters.KeyParameter;
 import io.github.joblo2213.JMacros.api.configuration.parameters.Parameter;
 import io.github.joblo2213.JMacros.api.configuration.parameters.PathParameter;
@@ -46,7 +46,7 @@ public class MacroData implements Macro {
             DEFAULT_COLOR
     );
     private final PathParameter imageUrl = new PathParameter(
-            JMacros.getInstance().getIconsDir(),
+            JMacros.getInstance().getConfigManager().getIconsDir(),
             "image",
             "Icon",
             "File location of the image that should be used as icon"

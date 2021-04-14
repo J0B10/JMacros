@@ -1,0 +1,92 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam stereotypeCBackgroundColor DeepSkyBlue
+skinparam stereotypeEBackgroundColor DeepSkyBlue
+skinparam stereotypeIBackgroundColor OliveDrab
+skinparam classArrowColor Black
+skinparam classBackgroundColor LightGray
+skinparam classBorderColor  Black
+skinparam noteBorderColor  Black
+
+
+interface adapters.MouseAdapter {
+    click(key)
+    press(key)
+    release(key)
+    moveTo(x, y)
+    getCursorX()
+    getCursorY()
+    getCursorPos()
+}
+
+interface adapters.KeyAdapter {
+    type(key)
+    press(key)
+    release(key)
+}
+
+interface adapters.ProfileAdapter {
+    getProfiles()
+    getCurrentProfile()
+    setCurrentProfile(profile)
+    nextProfile()
+    previousProfile()
+}
+
+interface adapters.ScreenAdapter {
+    ..
+}
+
+interface adapters.WebRequestAdapter
+
+interface adapters.ClipboardAdapter
+
+interface API
+
+interface org.pf4j.ExtensionPoint
+abstract class org.pf4j.Plugin {
+    start()
+    stop()
+    delete()
+}
+
+interface Action {
+    run(api)
+    ..
+    getParameters()
+}
+
+abstract class Plugin
+
+
+note left of Action
+    The action interface is the entrypoint for implementing
+    custom macro actions.
+    Actions annotated with @Extension will automatically
+    be loaded on startup.
+    All parameters required by the action must be defined and
+    returned by getParameters. The run() method is provided
+    with a reference to the api implementation so any adapter
+    can be used.
+end note
+
+note right of Plugin
+    If an extension developer needs control over the lifecycle
+    of the extension, they can extend plugin class and override
+    start(), stop() or delete(). Each plugin also has a reference
+    the api implementation.
+    Creating a plugin class is not mandatory for extensions.
+end note
+
+API --o Plugin
+Plugin --|> org.pf4j.Plugin
+Action --|> org.pf4j.ExtensionPoint
+API -- Action : run(api)
+adapters.MouseAdapter --* API : getMouseAdapter()
+adapters.KeyAdapter --* API : getKeyAdapter()
+adapters.ProfileAdapter --* API : getProfileAdapter()
+adapters.ScreenAdapter --* API : getScreenAdapter()
+adapters.WebRequestAdapter --* API : getWebRequestAdapter()
+adapters.ClipboardAdapter --* API : getClipboardAdapter()
+
+@enduml

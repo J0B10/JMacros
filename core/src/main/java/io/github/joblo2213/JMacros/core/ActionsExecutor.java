@@ -1,7 +1,8 @@
 package io.github.joblo2213.JMacros.core;
 
+import io.github.joblo2213.JMacros.api.API;
 import io.github.joblo2213.JMacros.api.Action;
-import io.github.joblo2213.JMacros.core.config.MacroData;
+import io.github.joblo2213.JMacros.api.Macro;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,12 +25,15 @@ public class ActionsExecutor extends ThreadPoolExecutor {
 
     public static final Logger logger = LoggerFactory.getLogger(ActionsExecutor.class);
 
-    public ActionsExecutor() {
+    private final API api;
+
+    public ActionsExecutor(API api) {
         super(1, Integer.MAX_VALUE, 5, TimeUnit.SECONDS, new SynchronousQueue<>(), new PoolThreadFactory());
+        this.api = api;
     }
 
-    public void runActions(MacroData macro) {
-       submit(new ActionsRunner(macro.getActions()));
+    public void runActions(Macro macro) {
+        submit(new ActionsRunner(macro.getActions()));
     }
 
     private static class PoolThreadFactory implements ThreadFactory {
@@ -51,7 +55,7 @@ public class ActionsExecutor extends ThreadPoolExecutor {
         }
     }
 
-    private static class ActionsRunner implements Runnable {
+    private class ActionsRunner implements Runnable {
 
         private final Iterable<Action> actions;
 
@@ -64,7 +68,7 @@ public class ActionsExecutor extends ThreadPoolExecutor {
             for (Action action : actions) {
                 String actionName = action.getClass().getSimpleName();
                 try {
-                    action.run();
+                    action.run(api);
                 } catch (InterruptedException e) {
                     logger.debug("Action " + actionName + " was interrupted");
                     return;

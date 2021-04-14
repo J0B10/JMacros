@@ -1,7 +1,7 @@
 package io.github.joblo2213.JMacros.core.ui.overlay;
 
+import io.github.joblo2213.JMacros.api.Macro;
 import io.github.joblo2213.JMacros.core.JMacros;
-import io.github.joblo2213.JMacros.core.config.MacroData;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.binding.ObjectBinding;
@@ -54,7 +54,7 @@ public class MacroIcon extends VBox {
         setBackground(Background.EMPTY);
     }
 
-    public MacroIcon(MacroData macro, DoubleProperty size) {
+    public MacroIcon(Macro macro, DoubleProperty size) {
         this(macro.getKeyCode(), new Image(macro.getImageUrl().toUri().toString()), macro.getColor(), size);
     }
 

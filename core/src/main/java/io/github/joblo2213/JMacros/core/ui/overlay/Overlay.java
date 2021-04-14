@@ -1,7 +1,7 @@
 package io.github.joblo2213.JMacros.core.ui.overlay;
 
+import io.github.joblo2213.JMacros.api.Profile;
 import io.github.joblo2213.JMacros.core.JMacros;
-import io.github.joblo2213.JMacros.core.config.ProfileData;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.image.Image;
@@ -33,7 +33,7 @@ public class Overlay {
         stage.setY((screen.getHeight() - scale.get() * 2));
     }
 
-    public void setProfile(ProfileData profile) {
+    public void setProfile(Profile profile) {
         stage.setScene(new ProfileScene(profile, scale));
     }
 

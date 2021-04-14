@@ -2,9 +2,8 @@ package io.github.joblo2213.JMacros.core.action;
 
 import io.github.joblo2213.JMacros.api.API;
 import io.github.joblo2213.JMacros.api.Action;
-import io.github.joblo2213.JMacros.api.adapters.KeyboardAdapter;
+import io.github.joblo2213.JMacros.api.adapters.MouseAdapter;
 import io.github.joblo2213.JMacros.api.configuration.parameters.EnumParameter;
-import io.github.joblo2213.JMacros.api.configuration.parameters.KeyParameter;
 import io.github.joblo2213.JMacros.api.configuration.parameters.Parameter;
 import org.pf4j.Extension;
 
@@ -12,32 +11,34 @@ import java.util.Collection;
 import java.util.List;
 
 @Extension
-public class Key implements Action {
+public class MouseButton implements Action {
 
-    private final KeyParameter key = new KeyParameter(
-            "key",
-            "Key",
-            "The key that is pressed/released"
+    private final EnumParameter<javafx.scene.input.MouseButton> button = new EnumParameter<>(
+            "button",
+            "Button",
+            "primary (left mouse button) / middle / secondary (right mouse button) / back / forward",
+            javafx.scene.input.MouseButton.PRIMARY
     );
+
     private final EnumParameter<Operation> operation = new EnumParameter<>(
             "operation",
             "Operation",
-            "press / release / type",
-            Operation.TYPE
+            "press / release / click",
+            Operation.CLICK
     );
 
     @Override
     public void run(API api) {
-        KeyboardAdapter keyboard = api.getKeyboardAdapter();
+        MouseAdapter mouse = api.getMouseAdapter();
         switch (operation.getValue()) {
             case PRESS:
-                keyboard.press(key.getValue());
+                mouse.press(button.getValue());
                 break;
             case RELEASE:
-                keyboard.release(key.getValue());
+                mouse.release(button.getValue());
                 break;
-            case TYPE:
-                keyboard.type(key.getValue());
+            case CLICK:
+                mouse.click(button.getValue());
                 break;
             default:
                 throw new NullPointerException();
@@ -46,10 +47,10 @@ public class Key implements Action {
 
     @Override
     public Collection<Parameter<?>> getParameters() {
-        return List.of(key, operation);
+        return List.of(button, operation);
     }
 
     public enum Operation {
-        PRESS, RELEASE, TYPE
+        PRESS, RELEASE, CLICK
     }
 }

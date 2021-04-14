@@ -1,11 +1,13 @@
 package io.github.joblo2213.JMacros.core;
 
-import io.github.joblo2213.JMacros.core.action.Key;
+import io.github.joblo2213.JMacros.api.API;
+import io.github.joblo2213.JMacros.api.Action;
+import io.github.joblo2213.JMacros.api.Macro;
+import io.github.joblo2213.JMacros.api.Profile;
 import io.github.joblo2213.JMacros.core.config.Config;
 import io.github.joblo2213.JMacros.core.config.ConfigManager;
-import io.github.joblo2213.JMacros.core.config.MacroData;
-import io.github.joblo2213.JMacros.core.config.ProfileData;
 import io.github.joblo2213.JMacros.core.nativehook.NativeHook;
+import io.github.joblo2213.JMacros.core.plugins.JMacrosPluginManager;
 import io.github.joblo2213.JMacros.core.registry.ActionRegistry;
 import io.github.joblo2213.JMacros.core.ui.overlay.Overlay;
 import io.github.joblo2213.JMacros.core.ui.tray.Tray;
@@ -16,9 +18,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.robot.Robot;
 import javafx.stage.Stage;
 
-import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -32,12 +33,14 @@ public class JMacros extends Application {
 
     private Robot robot;
     private ConfigManager configManager;
+    private JMacrosPluginManager pluginManager;
     private NativeHook nativeHook;
     private Overlay overlay;
     private ActionsExecutor actionsExecutor;
     private Tray tray;
+    private API api;
 
-    private volatile ProfileData currentProfile;
+    private volatile Profile currentProfile;
     private volatile ApplicationState state = ApplicationState.INIT;
 
     public static JMacros getInstance() {
@@ -45,34 +48,44 @@ public class JMacros extends Application {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init() {
         instance = this;
-        ActionRegistry.register(Key.class);
-
-        boolean isPortable = getParameters().getUnnamed().contains("portable");
-        configManager = new ConfigManager(isPortable);
-        configManager.saveDefaultConfig();
-        Platform.setImplicitExit(false);
     }
 
     @Override
     public void start(Stage stage) throws Exception {
         state = ApplicationState.STARTUP;
-        actionsExecutor = new ActionsExecutor();
+        Platform.setImplicitExit(false);
+
+        boolean isPortable = getParameters().getUnnamed().contains("portable");
+        configManager = new ConfigManager(isPortable);
+        configManager.saveDefaultConfig();
         configManager.loadConfig();
+
+        robot = new Robot();
+        api = new APIProvider(this);
+        pluginManager = new JMacrosPluginManager(api, configManager.getPluginsDir());
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
+        pluginManager.getExtensionClasses(Action.class).forEach(ActionRegistry::register);
+
         configManager.loadProfiles();
         currentProfile = configManager.getDefaultProfile().orElse(null);
+
         tray = new Tray(stage);
-        robot = new Robot();
-        nativeHook = new NativeHook(Level.WARNING);
         overlay = new Overlay(stage, getConfig().getScale());
+
+        actionsExecutor = new ActionsExecutor(api);
+
+        nativeHook = new NativeHook(Level.WARNING);
         MacroHandler macroHandler = new MacroHandler(this);
         nativeHook.registerKeyListener(KeyEvent.KEY_PRESSED, macroHandler);
+
         state = ApplicationState.PASSIVE;
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         state = ApplicationState.SHUTDOWN;
         actionsExecutor.shutdown();
         nativeHook.close();
@@ -86,7 +99,7 @@ public class JMacros extends Application {
 
     public void reloadConfig() {
         boolean overlayShown = getState() == ApplicationState.OVERLAY;
-        Optional<Integer> currentProfileID = Optional.ofNullable(currentProfile).map(ProfileData::getId);
+        Optional<Integer> currentProfileID = Optional.ofNullable(currentProfile).map(Profile::getId);
         if (overlayShown) showOverlay(false);
         configManager.loadConfig();
         configManager.loadProfiles();
@@ -95,32 +108,12 @@ public class JMacros extends Application {
         if (overlayShown && currentProfile != null) showOverlay(true);
     }
 
-    public Robot getRobot() {
-        return robot;
-    }
-
-    public Config getConfig() {
-        return configManager.getConfig();
-    }
-
-    public List<ProfileData> getProfiles() {
-        return configManager.getProfiles();
-    }
-
-    public synchronized Optional<ProfileData> getCurrentProfile() {
-        return Optional.ofNullable(currentProfile);
-    }
-
-    private synchronized void setCurrentProfile(ProfileData currentProfile) {
-        this.currentProfile = currentProfile;
-    }
-
     public boolean performAction(KeyCode functionKey) {
         if (!functionKey.isFunctionKey())
             throw new IllegalArgumentException(functionKey.getName() + " is not a function key");
         if (getCurrentProfile().isEmpty())
             throw new IllegalStateException("no profile active");
-        Optional<MacroData> macro = Arrays.stream(getCurrentProfile().get().getMacros())
+        Optional<Macro> macro = Arrays.stream(getCurrentProfile().get().getMacros())
                 .filter(m -> m != null && m.getKeyCode() == functionKey).findAny();
         if (macro.isEmpty()) return false;
         actionsExecutor.runActions(macro.get());
@@ -128,24 +121,49 @@ public class JMacros extends Application {
     }
 
     public void showOverlay(boolean show) {
-        Platform.runLater(() -> {
-            try {
-                ApplicationState state = getState();
-                if (state != ApplicationState.PASSIVE && state != ApplicationState.OVERLAY)
-                    throw new IllegalStateException(state.toString());
-                if (show) {
-                    if (getCurrentProfile().isEmpty()) return;
-                    setState(ApplicationState.OVERLAY);
-                    overlay.setProfile(getCurrentProfile().get());
-                    overlay.show();
-                } else {
-                    setState(ApplicationState.PASSIVE);
-                    overlay.hide();
-                }
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
-            }
-        });
+        ApplicationState state = getState();
+        if (state != ApplicationState.PASSIVE && state != ApplicationState.OVERLAY)
+            throw new IllegalStateException(state.toString());
+        if (show) {
+            if (getCurrentProfile().isEmpty()) return;
+            setState(ApplicationState.OVERLAY);
+            Platform.runLater(() -> {
+                overlay.setProfile(getCurrentProfile().get());
+                overlay.show();
+            });
+        } else {
+            setState(ApplicationState.PASSIVE);
+            Platform.runLater(() -> overlay.hide());
+        }
+    }
+
+    public API getApi() {
+        return api;
+    }
+
+    public Robot getRobot() {
+        return robot;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public Config getConfig() {
+        return configManager.getConfig();
+    }
+
+    public synchronized Optional<Profile> getCurrentProfile() {
+        return Optional.ofNullable(currentProfile);
+    }
+
+    public synchronized void setCurrentProfile(Profile currentProfile) {
+        Objects.requireNonNull(currentProfile);
+        boolean change = currentProfile != this.currentProfile;
+        this.currentProfile = currentProfile;
+        if (change && state == ApplicationState.OVERLAY) {
+            Platform.runLater(() -> overlay.setProfile(currentProfile));
+        }
     }
 
     public synchronized ApplicationState getState() {
@@ -154,9 +172,5 @@ public class JMacros extends Application {
 
     private synchronized void setState(ApplicationState state) {
         this.state = state;
-    }
-
-    public Path getIconsDir() {
-        return configManager.getIconsDir();
     }
 }

@@ -1,7 +1,7 @@
 package io.github.joblo2213.JMacros.core.ui.overlay;
 
-import io.github.joblo2213.JMacros.core.config.MacroData;
-import io.github.joblo2213.JMacros.core.config.ProfileData;
+import io.github.joblo2213.JMacros.api.Macro;
+import io.github.joblo2213.JMacros.api.Profile;
 import io.github.joblo2213.JMacros.core.utils.FunctionKey;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.Scene;
@@ -13,11 +13,11 @@ import java.util.Arrays;
 
 public class ProfileScene extends Scene {
 
-    public ProfileScene(ProfileData data, DoubleProperty scale) {
+    public ProfileScene(Profile data, DoubleProperty scale) {
         super(new HBox(), Color.TRANSPARENT);
         HBox root = (HBox) getRoot();
         root.setBackground(Background.EMPTY);
-        MacroData[] macros = data.getMacros();
+        Macro[] macros = data.getMacros();
         MacroIcon[] icons = new MacroIcon[12];
         for (int i = 0; i < 12; i++) {
             if (i < macros.length && macros[i] != null) {

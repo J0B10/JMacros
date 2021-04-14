@@ -43,6 +43,7 @@ public class ConfigManager {
     private final Path configFile;
     private final Path profilesDir;
     private final Path iconsDir;
+    private final Path pluginsDir;
 
     private final HashMap<Integer, Path> profileConfigFiles = new HashMap<>();
     private final List<ProfileData> profiles = new ArrayList<>();
@@ -72,6 +73,7 @@ public class ConfigManager {
         configFile = configDir.resolve("config.json");
         profilesDir = configDir.resolve("profiles");
         iconsDir = configDir.resolve("icons");
+        pluginsDir = configDir.resolve("plugins");
     }
 
 
@@ -86,6 +88,7 @@ public class ConfigManager {
             }
             if (!Files.exists(profilesDir)) Files.createDirectories(profilesDir);
             if (!Files.exists(iconsDir)) Files.createDirectories(iconsDir);
+            if (!Files.exists(pluginsDir)) Files.createDirectories(pluginsDir);
         } catch (IOException e) {
             logger.error("Could not create default config: " + e.getMessage(), e);
             //TODO Exception handling
@@ -172,5 +175,9 @@ public class ConfigManager {
 
     public Path getIconsDir() {
         return iconsDir;
+    }
+
+    public Path getPluginsDir() {
+        return pluginsDir;
     }
 }
