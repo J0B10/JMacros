@@ -50,8 +50,10 @@ public class ConfigManager {
     private Config config = new Config();
 
     public ConfigManager(boolean isPortable) {
-        if (isPortable) configDir = Paths.get(System.getProperty("user.dir"));
-        else {
+        if (isPortable) {
+            configDir = Paths.get(System.getProperty("user.dir"));
+            logger.debug("Started in portable mode.");
+        } else {
             Path configDir;
             configDir = Paths.get(System.getProperty("user.home")).resolve(".jmacros");
             if (System.getProperty("os.name").startsWith("mac"))
@@ -59,10 +61,16 @@ public class ConfigManager {
 
             String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
             try {
-                if (xdgConfigHome != null && !xdgConfigHome.isBlank()) configDir = Paths.get(xdgConfigHome).resolve("jmacros");
+                if (xdgConfigHome != null && !xdgConfigHome.isBlank()) {
+                    configDir = Paths.get(xdgConfigHome).resolve("jmacros");
+                    logger.debug("Using $XDG_CONFIG_HOME for configs");
+                } else {
+                    logger.debug("Using user home dir for configs");
+                }
             } catch (InvalidPathException e) {
-                logger.error("XDG_CONFIG_HOME environment variable does not point to a valid path");
-                logger.error(e.getMessage(), e);
+                logger.warn("XDG_CONFIG_HOME environment variable does not point to a valid path");
+                logger.warn(e.getMessage());
+                logger.debug(e.getMessage(), e);
                 logger.info("Falling back to legacy dir");
             }
 
@@ -84,27 +92,32 @@ public class ConfigManager {
                 try (BufferedWriter bw = Files.newBufferedWriter(configFile, StandardCharsets.UTF_8)) {
                     config = new Config();
                     gson.toJson(config, bw);
+                    logger.info("Saved default config.");
                 }
             }
             if (!Files.exists(profilesDir)) Files.createDirectories(profilesDir);
             if (!Files.exists(iconsDir)) Files.createDirectories(iconsDir);
             if (!Files.exists(pluginsDir)) Files.createDirectories(pluginsDir);
         } catch (IOException e) {
-            logger.error("Could not create default config: " + e.getMessage(), e);
+            logger.error("Could not create default config: ");
+            logger.error(e.getMessage());
+            logger.debug(e.getMessage(), e);
             //TODO Exception handling
         }
 
     }
 
     public void saveProfiles() {
+        logger.info("Saving profiles...");
         for (ProfileData profile : profiles) {
             Path path = profileConfigFiles.get(profile.getId());
             try (BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
                 gson.toJson(profile, bw);
+                logger.debug("Saved profile '{}'.", profile.getName());
             } catch (IOException | JsonParseException e) {
-                logger.warn("Could not load profile "
-                        + path.getFileName().toString().replaceAll("\\.json$", "") + ": "
-                        + e.getMessage(), e);
+                logger.warn("Could not save profile '{}': ", path.getFileName().toString().replaceAll("\\.json$", ""));
+                logger.warn(e.getMessage());
+                logger.debug(e.getMessage(), e);
                 //TODO Exception handling
             }
         }
@@ -123,16 +136,18 @@ public class ConfigManager {
                         throw new JsonParseException("profile with id " + profile.getId() + " already exists");
                     profileConfigFiles.put(profile.getId(), path);
                     profiles.add(profile);
+                    logger.debug("Loaded profile '{}'.", profile.getName());
                 } catch (IOException | JsonParseException e) {
-                    logger.warn("Could not load profile "
-                            + path.getFileName().toString().replaceAll("\\.json$", "") + ": "
-                            + e.getMessage(), e);
-                    //TODO Exception handling
+                    logger.warn("Could not load profile '{}': ", path.getFileName().toString().replaceAll("\\.json$", ""));
+                    logger.warn(e.getMessage());
+                    logger.debug(e.getMessage(), e);
                 }
             });
-            logger.info("Loaded " + profiles.size() + " profiles");
+            logger.info("Loaded " + profiles.size() + " profiles.");
         } catch (IOException e) {
-            logger.error("Could not list profiles: " + e.getMessage(), e);
+            logger.error("Could not list profiles: ");
+            logger.error(e.getMessage());
+            logger.debug(e.getMessage(), e);
             //TODO Exception handling
         }
     }
@@ -141,8 +156,11 @@ public class ConfigManager {
         logger.info("Saving config...");
         try (BufferedWriter bw = Files.newBufferedWriter(configFile, StandardCharsets.UTF_8)) {
             gson.toJson(config, bw);
+            logger.debug("Saved config.");
         } catch (IOException | JsonParseException e) {
-            logger.warn("Could not load config: " + e.getMessage(), e);
+            logger.warn("Could not save config: ");
+            logger.warn(e.getMessage());
+            logger.debug(e.getMessage(), e);
             //TODO Exception handling
         }
     }
@@ -152,7 +170,9 @@ public class ConfigManager {
         try (BufferedReader br = Files.newBufferedReader(configFile, StandardCharsets.UTF_8)) {
             config = gson.fromJson(br, Config.class);
         } catch (IOException | JsonParseException e) {
-            logger.warn("Could not load config: " + e.getMessage(), e);
+            logger.warn("Could not load config: ");
+            logger.warn(e.getMessage());
+            logger.debug(e.getMessage(), e);
             //TODO Exception handling
         }
     }

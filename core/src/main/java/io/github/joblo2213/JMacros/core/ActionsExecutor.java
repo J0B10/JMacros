@@ -36,6 +36,27 @@ public class ActionsExecutor extends ThreadPoolExecutor {
         submit(new ActionsRunner(macro.getActions()));
     }
 
+    public void terminateExecution(long timeout, TimeUnit unit) {
+        try {
+            timeout = TimeUnit.MILLISECONDS.convert(timeout, unit) / 2;
+            boolean shutdown = awaitTermination(timeout, TimeUnit.MILLISECONDS);
+            if (!shutdown) {
+                logger.warn("Actions Executor has not finished. Shutting down now.");
+                shutdownNow();
+                shutdown = awaitTermination(timeout, TimeUnit.MILLISECONDS);
+                if (!shutdown) {
+                    logger.error("Failed to gracefully shut down actions executor");
+
+                } else {
+                    logger.debug("Actions executor stopped");
+                }
+            } else {
+                logger.debug("Actions executor stopped");
+            }
+        } catch (InterruptedException ignored) {
+        }
+    }
+
     private static class PoolThreadFactory implements ThreadFactory {
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);
@@ -70,10 +91,12 @@ public class ActionsExecutor extends ThreadPoolExecutor {
                 try {
                     action.run(api);
                 } catch (InterruptedException e) {
-                    logger.debug("Action " + actionName + " was interrupted");
+                    logger.info("Action '{}' was interrupted", actionName);
+                    logger.debug(e.getMessage(), e);
                     return;
                 } catch (Exception e) {
-                    logger.error("Exception while running macro action " + actionName + ": " + e.getMessage(), e);
+                    logger.error("Exception while running macro action '{}': ", actionName);
+                    logger.error(e.getMessage(), e);
                 }
             }
         }

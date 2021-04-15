@@ -7,11 +7,15 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
 public class Overlay {
+
+    public static final Logger logger = LoggerFactory.getLogger(Overlay.class);
 
     private final Stage stage;
     private final DoubleProperty scale;
@@ -34,14 +38,17 @@ public class Overlay {
     }
 
     public void setProfile(Profile profile) {
+        logger.debug("Now displaying profile {}", profile.getName());
         stage.setScene(new ProfileScene(profile, scale));
     }
 
     public void show() {
+        logger.debug("Showing overlay");
         stage.show();
     }
 
     public void hide() {
+        logger.debug("Hiding overlay");
         stage.hide();
     }
 
