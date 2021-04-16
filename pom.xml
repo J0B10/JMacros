@@ -13,7 +13,6 @@
     <modules>
         <module>API</module>
         <module>core</module>
-        <module>FXTrayIcon</module>
         <module>demo_plugin</module>
     </modules>
 
